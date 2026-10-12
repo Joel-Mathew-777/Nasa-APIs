@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <body className="min-h-screen font-sans">
         <Nav />
-        <main className="mx-auto w-full max-w-6xl px-5 pb-24 sm:px-8">{children}</main>
+        <main className="mx-auto w-full max-w-6xl px-5 pb-16 sm:px-8 sm:pb-24">{children}</main>
         <footer className="border-t border-line">
           <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-8 text-sm text-faint sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <p>Data courtesy of NASA, JPL and Caltech/IPAC. Not affiliated with or endorsed by NASA.</p>

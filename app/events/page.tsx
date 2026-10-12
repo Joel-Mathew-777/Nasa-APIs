@@ -69,7 +69,7 @@ function Events({ events }: { events: EarthEvent[] }) {
       <Section title="Open events" note={`${events.length} reported in the last 45 days`}>
         <ul className="grid gap-px overflow-hidden rounded-xl border border-line bg-line md:grid-cols-2">
           {events.slice(0, 40).map((e) => (
-            <li key={e.id} className="flex gap-4 bg-panel p-5">
+            <li key={e.id} className="flex gap-3 bg-panel p-4 sm:gap-4 sm:p-5">
               <span
                 className="mt-1.5 size-2 shrink-0 rounded-full"
                 style={{ background: colorOf(e.categoryId) }}

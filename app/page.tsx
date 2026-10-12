@@ -20,12 +20,12 @@ export const revalidate = 3600;
 export default function Home() {
   return (
     <>
-      <section className="pt-16 pb-12 sm:pt-28 sm:pb-16">
+      <section className="pt-12 pb-10 sm:pt-28 sm:pb-16">
         <p className="font-mono text-xs tracking-widest text-accent uppercase">Ten open APIs · live data</p>
-        <h1 className="mt-5 max-w-4xl text-5xl font-medium tracking-tight text-balance sm:text-7xl">
+        <h1 className="mt-5 max-w-4xl text-4xl font-medium tracking-tight text-balance sm:text-7xl">
           What NASA knows, right now.
         </h1>
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-muted sm:text-xl">
+        <p className="mt-5 max-w-2xl text-base leading-relaxed text-pretty text-muted sm:mt-6 sm:text-xl">
           Asteroids passing this week, storms on the Sun, fires seen from orbit and every planet found around
           another star. All of it is public, and all of it is on this site.
         </p>
@@ -47,7 +47,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Suspense fallback={<div className="skeleton aspect-video rounded-2xl sm:aspect-21/9" />}>
+      <Suspense fallback={<div className="skeleton aspect-4/3 rounded-2xl sm:aspect-21/9" />}>
         <Feature />
       </Suspense>
 
@@ -57,8 +57,8 @@ export default function Home() {
         </Suspense>
       </div>
 
-      <section id="apis" className="mt-24 scroll-mt-24">
-        <h2 className="text-3xl font-medium tracking-tight">The APIs</h2>
+      <section id="apis" className="mt-16 scroll-mt-20 sm:mt-24 sm:scroll-mt-24">
+        <h2 className="text-2xl font-medium tracking-tight sm:text-3xl">The APIs</h2>
         <p className="mt-3 max-w-2xl text-muted">
           Each page below is built from live responses. Only two of them need an API key.
         </p>
@@ -67,7 +67,7 @@ export default function Home() {
             <li key={item.href} className="bg-panel">
               <Link
                 href={item.href}
-                className="group flex h-full flex-col p-6 transition-colors hover:bg-raised sm:p-7"
+                className="group flex h-full flex-col p-5 transition-colors hover:bg-raised sm:p-7"
               >
                 <div className="flex items-center justify-between gap-4">
                   <p className="font-mono text-xs tracking-wider text-accent uppercase">{item.api}</p>
@@ -140,7 +140,7 @@ function FeatureCard({
   return (
     <Link
       href={href}
-      className="group relative block aspect-video overflow-hidden rounded-2xl border border-line bg-black sm:aspect-21/9"
+      className="group relative block aspect-4/3 overflow-hidden rounded-2xl border border-line bg-black sm:aspect-21/9"
     >
       <img
         src={image}
@@ -150,9 +150,9 @@ function FeatureCard({
         }`}
       />
       <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/10 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-6 sm:p-9">
+      <div className="absolute inset-x-0 bottom-0 p-5 sm:p-9">
         <p className="font-mono text-xs tracking-wider text-white/70 uppercase">{label}</p>
-        <p className="mt-2 max-w-2xl text-2xl font-medium tracking-tight text-balance sm:text-3xl">{title}</p>
+        <p className="mt-2 line-clamp-3 max-w-2xl text-xl font-medium tracking-tight text-balance sm:text-3xl">{title}</p>
       </div>
     </Link>
   );

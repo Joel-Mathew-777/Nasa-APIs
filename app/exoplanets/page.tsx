@@ -42,8 +42,8 @@ function Summary({ data }: { data: ExoplanetSummary }) {
       </Stats>
 
       <Section title="Discoveries per year" note="Since the first confirmed detection in 1992">
-        <Panel className="p-5 sm:p-6">
-          <div className="flex h-48 items-end gap-0.5 sm:gap-1" role="img" aria-label="Bar chart of exoplanet discoveries per year">
+        <Panel className="p-4 sm:p-6">
+          <div className="flex h-40 items-end gap-px sm:h-48 sm:gap-1" role="img" aria-label="Bar chart of exoplanet discoveries per year">
             {years.map((y) => (
               <div
                 key={y.disc_year}
@@ -69,9 +69,11 @@ function Summary({ data }: { data: ExoplanetSummary }) {
         <Panel>
           <ul className="divide-y divide-line">
             {data.methods.slice(0, 8).map((m) => (
-              <li key={m.discoverymethod} className="grid grid-cols-[minmax(0,12rem)_1fr_4rem] items-center gap-4 px-5 py-3 text-sm">
+              <li key={m.discoverymethod} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 px-4 py-3 text-sm sm:grid-cols-[minmax(0,12rem)_1fr_4rem] sm:px-5">
                 <span className="truncate">{m.discoverymethod}</span>
-                <Meter value={m.n} max={top.n} />
+                <span className="order-last col-span-2 sm:order-none sm:col-span-1">
+                  <Meter value={m.n} max={top.n} />
+                </span>
                 <span className="text-right text-muted tabular-nums">{num(m.n)}</span>
               </li>
             ))}

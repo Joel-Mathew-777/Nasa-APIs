@@ -12,10 +12,10 @@ export function PageHeader({
   children: ReactNode;
 }) {
   return (
-    <header className="pt-14 pb-10 sm:pt-20">
+    <header className="pt-10 pb-8 sm:pt-20 sm:pb-10">
       <p className="font-mono text-xs tracking-widest text-accent uppercase">{api}</p>
-      <h1 className="mt-4 max-w-3xl text-4xl font-medium tracking-tight text-balance sm:text-5xl">{title}</h1>
-      <p className="mt-4 max-w-2xl text-lg leading-relaxed text-pretty text-muted">{children}</p>
+      <h1 className="mt-4 max-w-3xl text-3xl font-medium tracking-tight text-balance sm:text-5xl">{title}</h1>
+      <p className="mt-4 max-w-2xl text-base leading-relaxed text-pretty text-muted sm:text-lg">{children}</p>
       <p className="mt-6 inline-flex max-w-full items-center gap-2 rounded-md border border-line bg-panel px-3 py-1.5 font-mono text-xs text-muted">
         <span className="text-faint">GET</span>
         <span className="truncate">{endpoint}</span>
@@ -34,7 +34,7 @@ export function Section({
   children: ReactNode;
 }) {
   return (
-    <section className="mt-14">
+    <section className="mt-10 sm:mt-14">
       <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2 className="text-xl font-medium tracking-tight">{title}</h2>
         {note && <p className="text-sm text-faint">{note}</p>}
@@ -54,10 +54,10 @@ export function Stats({ children }: { children: ReactNode }) {
 
 export function Stat({ label, value, hint }: { label: string; value: ReactNode; hint?: ReactNode }) {
   return (
-    <div className="flex flex-col bg-panel p-5">
-      <dt className="text-sm text-muted">{label}</dt>
-      <dd className="mt-3 text-3xl font-medium tracking-tight tabular-nums">{value}</dd>
-      {hint && <dd className="mt-1.5 truncate text-sm text-faint">{hint}</dd>}
+    <div className="flex min-w-0 flex-col bg-panel p-4 sm:p-5">
+      <dt className="text-xs text-muted sm:text-sm">{label}</dt>
+      <dd className="mt-auto pt-3 text-2xl font-medium tracking-tight break-words tabular-nums sm:text-3xl">{value}</dd>
+      {hint && <dd className="mt-1.5 truncate text-xs text-faint sm:text-sm">{hint}</dd>}
     </div>
   );
 }
@@ -98,7 +98,7 @@ export function DataTable({ head, children }: { head: string[]; children: ReactN
   return (
     <Panel>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] text-left text-sm [&_td]:px-5 [&_td]:py-3 [&_th]:px-5 [&_th]:py-3 [&_tbody_tr]:border-t [&_tbody_tr]:border-line">
+        <table className="w-full min-w-[640px] text-left text-sm [&_td]:px-4 [&_td]:py-3 [&_th]:px-4 [&_th]:py-3 sm:[&_td]:px-5 sm:[&_th]:px-5 [&_tbody_tr]:border-t [&_tbody_tr]:border-line">
           <thead className="text-xs text-faint">
             <tr>
               {head.map((h) => (

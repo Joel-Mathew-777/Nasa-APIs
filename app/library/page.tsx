@@ -30,11 +30,11 @@ export default async function LibraryPage({ searchParams }: { searchParams: Prom
           type="search"
           defaultValue={q}
           placeholder="Search for a mission, planet or person"
-          className="min-w-0 flex-1 rounded-full border border-line bg-panel px-5 py-3 text-base placeholder:text-faint focus:border-muted focus:outline-none"
+          className="min-w-0 flex-1 rounded-full border border-line bg-panel px-4 py-3 text-base placeholder:text-faint focus:border-muted focus:outline-none sm:px-5"
         />
         <button
           type="submit"
-          className="rounded-full bg-white px-6 py-3 text-sm font-medium text-ink transition-opacity hover:opacity-85"
+          className="shrink-0 rounded-full bg-white px-5 py-3 text-sm font-medium text-ink transition-opacity hover:opacity-85 sm:px-6"
         >
           Search
         </button>
@@ -47,7 +47,7 @@ export default async function LibraryPage({ searchParams }: { searchParams: Prom
               <Link
                 href={`/library?q=${encodeURIComponent(s)}`}
                 aria-current={active ? "true" : undefined}
-                className={`inline-block rounded-full border px-3 py-1 text-sm transition-colors ${
+                className={`inline-block rounded-full border px-3 py-1.5 text-sm transition-colors sm:py-1 ${
                   active ? "border-muted text-white" : "border-line text-muted hover:text-white"
                 }`}
               >

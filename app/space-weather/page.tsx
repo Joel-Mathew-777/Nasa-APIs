@@ -83,7 +83,7 @@ export default async function SpaceWeatherPage() {
               const analysis = c.cmeAnalyses?.find((a) => a.isMostAccurate) ?? c.cmeAnalyses?.[0];
               return (
                 <li key={c.activityID} className="rounded-xl border border-line bg-panel p-5">
-                  <div className="flex items-baseline justify-between gap-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                     <p className="font-medium tabular-nums">{date(c.startTime, true)} UTC</p>
                     {analysis?.speed != null && (
                       <p className="shrink-0 text-sm text-muted tabular-nums">{num(analysis.speed)} km/s</p>

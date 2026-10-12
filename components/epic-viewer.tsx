@@ -17,19 +17,19 @@ export function EpicViewer({ frames }: { frames: EpicFrame[] }) {
           alt={`Earth seen from DSCOVR on ${date(frame.date, true)} UTC`}
           className="mx-auto aspect-square w-full max-w-2xl object-contain"
         />
-        <div className="flex flex-col justify-end gap-6 border-t border-line p-6 lg:border-t-0 lg:border-l">
-          <dl className="space-y-5 text-sm">
+        <div className="flex flex-col justify-end gap-5 border-t border-line p-5 sm:p-6 lg:gap-6 lg:border-t-0 lg:border-l">
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-4 text-sm lg:grid-cols-1 lg:gap-y-5">
             <div>
               <dt className="text-muted">Captured</dt>
-              <dd className="mt-1 text-lg tabular-nums">{date(frame.date, true)} UTC</dd>
+              <dd className="mt-1 text-base tabular-nums sm:text-lg">{date(frame.date, true)} UTC</dd>
             </div>
             <div>
               <dt className="text-muted">Centred over</dt>
-              <dd className="mt-1 text-lg tabular-nums">{coords(frame.lat, frame.lon)}</dd>
+              <dd className="mt-1 text-base tabular-nums sm:text-lg">{coords(frame.lat, frame.lon)}</dd>
             </div>
             <div>
               <dt className="text-muted">Frame</dt>
-              <dd className="mt-1 text-lg tabular-nums">
+              <dd className="mt-1 text-base tabular-nums sm:text-lg">
                 {index + 1} of {frames.length}
               </dd>
             </div>

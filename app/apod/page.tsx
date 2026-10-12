@@ -24,7 +24,7 @@ export default async function ApodPage() {
         <>
           <Today entry={apod.data[0]} />
           <Section title="Earlier this week" note="Select a picture to open the original">
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-6 lg:grid-cols-4">
               {apod.data.slice(1).map((a) => (
                 <li key={a.date}>
                   <a href={a.hdurl ?? a.url} target="_blank" rel="noreferrer" className="group block">
@@ -54,7 +54,7 @@ export default async function ApodPage() {
 function Today({ entry }: { entry: Apod }) {
   const image = apodImage(entry);
   return (
-    <article className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-12">
+    <article className="grid gap-6 sm:gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-12">
       <a
         href={entry.hdurl ?? entry.url}
         target="_blank"
@@ -68,7 +68,7 @@ function Today({ entry }: { entry: Apod }) {
           {date(entry.date)}
           {entry.media_type !== "image" && <Tag>Video</Tag>}
         </div>
-        <h2 className="mt-3 text-3xl font-medium tracking-tight text-balance">{entry.title}</h2>
+        <h2 className="mt-3 text-2xl font-medium tracking-tight text-balance sm:text-3xl">{entry.title}</h2>
         <p className="mt-5 leading-relaxed text-pretty text-muted">{entry.explanation}</p>
         {entry.copyright && (
           <p className="mt-6 text-sm text-faint">Image credit: {entry.copyright.replace(/\s+/g, " ").trim()}</p>
