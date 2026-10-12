@@ -2,6 +2,8 @@
 
 A Next.js site that shows what NASA's open APIs return, using live data. Each page is built from one or two APIs and explains what the data means.
 
+**Live site:** [nasa-ap-is-brown.vercel.app](https://nasa-ap-is-brown.vercel.app)
+
 ## Run it
 
 ```bash
