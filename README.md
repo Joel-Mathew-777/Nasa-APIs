@@ -31,6 +31,14 @@ The key is only read on the server, so it never reaches the browser.
 | `/asteroids` | Asteroids NeoWs | `api.nasa.gov/neo/rest/v1/feed` | Yes | Every asteroid passing Earth in the next 7 days: size, speed, miss distance, hazard flag |
 | `/asteroids` | SBDB Close Approach Data | `ssd-api.jpl.nasa.gov/cad.api` | No | The closest predicted passes (within 10 lunar distances) over the next 60 days |
 | `/space-weather` | DONKI | `ccmc.gsfc.nasa.gov/DONKI/WS/get/{FLR,CME,GST}` | No | Solar flares (30 days), coronal mass ejections (7 days), geomagnetic storms (55 days) |
+| `/space-weather` | NOAA SWPC | `services.swpc.noaa.gov/{json,products}/...` | No | Live X-ray flux (flare class), solar wind, NOAA R/S/G scales, and the Kp index with a 3-day forecast |
+| `/asteroids` | Sentry | `ssd-api.jpl.nasa.gov/sentry.api` | No | Asteroids whose future impact can't yet be ruled out, ranked by Palermo scale |
+| `/launches` | Launch Library 2 | `ll.thespacedevs.com/2.3.0/launches/upcoming` | No | The next 12 launches worldwide with countdowns (free tier: 15 requests an hour) |
+| `/launches` | Spaceflight News API | `api.spaceflightnewsapi.net/v4/articles` | No | The latest spaceflight news articles |
+| `/satellites` | Where the ISS at | `api.wheretheiss.at/v1/satellites/25544` | No | The ISS position, polled live from the browser, over a one-orbit ground track |
+| `/satellites` | CelesTrak GP | `celestrak.org/NORAD/elements/gp.php` | No | Orbital elements for stations, the brightest satellites, GPS and weather satellites (cached 4 hours, as CelesTrak asks) |
+| `/visualizations` | Scientific Visualization Studio | `svs.gsfc.nasa.gov/api/search` | No | Keyword search across Goddard's data visualizations and animations |
+| `/technology` | Technology Transfer | `technology.nasa.gov/api/api/{patent,software,spinoff}/{q}` | No | NASA patents, free software and spinoff products |
 | `/earth` | EPIC | `epic.gsfc.nasa.gov/api/natural` | No | The latest full-disc photographs of Earth from the DSCOVR spacecraft |
 | `/events` | EONET v3 | `eonet.gsfc.nasa.gov/api/v3/events` | No | Open wildfires, storms, volcanoes and icebergs, plotted on a map |
 | `/fireballs` | CNEOS Fireball | `ssd-api.jpl.nasa.gov/fireball.api` | No | The 80 most recent atmospheric fireballs with location, energy and speed |
@@ -53,11 +61,10 @@ These are open NASA APIs the site does not use yet.
 | Image Library assets | `images-api.nasa.gov/{asset,metadata,captions}/{nasa_id}` | No | Original files, EXIF metadata and video captions; search also covers video and audio |
 | GIBS tiles | `gibs.earthdata.nasa.gov/wmts/...` | No | Over 1,000 daily global satellite layers as map tiles (WMTS, WMS, TWMS) |
 | Earth imagery (Landsat) | `api.nasa.gov/planetary/earth/{imagery,assets}` | Yes | A Landsat 8 image for a latitude, longitude and date |
-| TechTransfer | `api.nasa.gov/techtransfer/{patent,software,spinoff}` | Yes | NASA patents, software and spinoff technologies |
 | TechPort | `techport.nasa.gov/api` | No | NASA's portfolio of technology development projects |
 | Open Science Data Repository | `osdr.nasa.gov/osdr/data/` | No | Space biology experiments, datasets and metadata (formerly GeneLab) |
 | Satellite Situation Center | `sscweb.gsfc.nasa.gov/WS/sscr/2` | No | Positions of spacecraft over time |
-| SBDB, Sentry, Scout, Horizons | `ssd-api.jpl.nasa.gov/{sbdb,sentry,scout,horizons}.api` | No | Small-body orbits, impact risk assessments, newly found objects, ephemerides |
+| SBDB, Scout, Horizons | `ssd-api.jpl.nasa.gov/{sbdb,scout,horizons}.api` | No | Small-body orbits, newly found objects, ephemerides |
 | Mars, Moon and Vesta Trek | `trek.nasa.gov/tiles/...` | No | Planetary surface imagery as WMTS map tiles |
 | TLE API | `tle.ivanstanojevic.me/api/tle` | No | Two-line orbital elements for Earth satellites (community-run, listed by NASA) |
 

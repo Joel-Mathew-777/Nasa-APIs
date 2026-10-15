@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <>
       <section className="pt-12 pb-10 sm:pt-28 sm:pb-16">
-        <p className="font-mono text-xs tracking-widest text-accent uppercase">Ten open APIs · live data</p>
+        <p className="font-mono text-xs tracking-widest text-accent uppercase">Eighteen open APIs · live data</p>
         <h1 className="mt-5 max-w-4xl text-4xl font-medium tracking-tight text-balance sm:text-7xl">
           What NASA knows, right now.
         </h1>

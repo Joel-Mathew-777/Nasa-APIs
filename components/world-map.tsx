@@ -1,4 +1,7 @@
-import { WORLD_MAP } from "@/lib/nasa";
+/** Blue Marble base map rendered by the GIBS WMS service (equirectangular). */
+const WORLD_MAP =
+  "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0" +
+  "&LAYERS=BlueMarble_ShadedRelief_Bathymetry&CRS=EPSG:4326&BBOX=-90,-180,90,180&WIDTH=1600&HEIGHT=800&FORMAT=image/jpeg";
 
 export type MapPoint = {
   id: string;

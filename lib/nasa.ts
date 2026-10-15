@@ -1,5 +1,9 @@
 import "server-only";
 
+import { get, HOUR, map, type Result } from "./http";
+
+export type { Result };
+
 const KEY = process.env.NASA_API_KEY || "DEMO_KEY";
 
 const API = "https://api.nasa.gov";
@@ -9,35 +13,10 @@ const EONET = "https://eonet.gsfc.nasa.gov/api/v3";
 const IMAGES = "https://images-api.nasa.gov";
 const EXOPLANETS = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync";
 const SSD = "https://ssd-api.jpl.nasa.gov";
+const SVS = "https://svs.gsfc.nasa.gov/api";
+const TECH = "https://technology.nasa.gov/api/api";
 
-const HOUR = 3600;
 const LD_PER_AU = 389.17;
-
-export type Result<T> = { ok: true; data: T } | { ok: false; error: string };
-
-async function get<T>(url: string, revalidate = HOUR, timeout = 15000): Promise<Result<T>> {
-  try {
-    const res = await fetch(url, {
-      next: { revalidate },
-      signal: AbortSignal.timeout(timeout),
-    });
-    if (res.status === 429) {
-      return { ok: false, error: "Rate limit reached. Add your own NASA_API_KEY to lift it." };
-    }
-    if (!res.ok) return { ok: false, error: `The service responded with ${res.status}.` };
-    return { ok: true, data: (await res.json()) as T };
-  } catch (e) {
-    const timedOut = e instanceof Error && e.name === "TimeoutError";
-    return {
-      ok: false,
-      error: timedOut ? "The service took too long to respond." : "The service could not be reached.",
-    };
-  }
-}
-
-function map<T, U>(r: Result<T>, fn: (data: T) => U): Result<U> {
-  return r.ok ? { ok: true, data: fn(r.data) } : r;
-}
 
 /** UTC calendar day as YYYY-MM-DD, offset in days from today. */
 export function isoDay(offset = 0): string {
@@ -63,7 +42,46 @@ export type Apod = {
 export async function getApod(): Promise<Result<Apod[]>> {
   const url = `${API}/planetary/apod?api_key=${KEY}&start_date=${isoDay(-8)}&thumbs=true`;
   const r = await get<Apod[]>(url, HOUR, 10000);
-  return map(r, (d) => [...d].reverse());
+  if (!r.ok) return r;
+  const days = [...r.data].reverse();
+  if (!days.some(isBrokenApod)) return { ok: true, data: days };
+  const archive = await fetchHtml(`${APOD_SITE}/apod/archive/`);
+  return { ok: true, data: await Promise.all(days.map((a) => (isBrokenApod(a) ? repairApod(a, archive) : a))) };
+}
+
+// Since APOD moved to science.nasa.gov the API sometimes scrapes the page chrome
+// instead of the entry: the title comes back as "NASA Science" and the image as
+// the site logo, while the explanation is correct.
+const APOD_SITE = "https://science.nasa.gov";
+const MONTHS = "january february march april may june july august september october november december".split(" ");
+
+function isBrokenApod(a: Apod): boolean {
+  return a.title.trim() === "NASA Science" || /nasa-logo/i.test(`${a.url} ${a.hdurl}`);
+}
+
+async function fetchHtml(url: string): Promise<string | undefined> {
+  try {
+    const res = await fetch(url, { next: { revalidate: HOUR }, signal: AbortSignal.timeout(10000) });
+    return res.ok ? await res.text() : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Recovers the real title and image from the entry's science.nasa.gov article. */
+async function repairApod(a: Apod, archive: string | undefined): Promise<Apod> {
+  const [y, m, d] = a.date.split("-");
+  const slug = `apod-${y}-${MONTHS[Number(m) - 1]}-${Number(d)}-`;
+  const path = archive?.match(new RegExp(`/image-article/${slug}[a-z0-9-]*/`))?.[0];
+  const html = path ? await fetchHtml(APOD_SITE + path) : undefined;
+  const title = html?.match(/<h1[^>]*>([^<]+)/)?.[1];
+  const image = html?.match(/property="og:image" content="([^"]+)"/)?.[1];
+  const link = path ? APOD_SITE + path : `${APOD_SITE}/apod/archive/`;
+  const base = { ...a, media_type: "image", thumbnail_url: undefined };
+
+  // Better no picture than the NASA logo; the card still links to the source.
+  if (!title || !image) return { ...base, title: "Astronomy Picture of the Day", url: undefined, hdurl: link };
+  return { ...base, title: plain(title), url: image, hdurl: image.replace(/\/jcr:content\/.*$/, "") };
 }
 
 export function apodImage(a: Apod): string | undefined {
@@ -175,6 +193,55 @@ export async function getFireballs(): Promise<Result<Fireball[]>> {
       velKps: r.vel == null ? null : Number(r.vel),
     })),
   );
+}
+
+export type ImpactRisk = {
+  name: string;
+  url: string;
+  years: string;
+  impacts: number;
+  probability: number;
+  palermo: number;
+  torino: number;
+  diameterM: number;
+  kps: number;
+  lastObs: string;
+};
+
+/** Objects on JPL's Sentry impact-monitoring list, ranked by cumulative Palermo scale. */
+export async function getImpactRisks(): Promise<Result<{ total: number; list: ImpactRisk[] }>> {
+  type Raw = {
+    count: string;
+    data: {
+      des: string;
+      range: string;
+      n_imp: number;
+      ip: string;
+      ps_cum: string;
+      ts_max: string | null;
+      diameter: string;
+      v_inf: string;
+      last_obs: string;
+    }[];
+  };
+  return map(await get<Raw>(`${SSD}/sentry.api`, HOUR * 12, 20000), (d) => ({
+    total: Number(d.count),
+    list: d.data
+      .map((r) => ({
+        name: r.des,
+        url: `https://cneos.jpl.nasa.gov/sentry/details.html#?des=${encodeURIComponent(r.des)}`,
+        years: r.range,
+        impacts: r.n_imp,
+        probability: Number(r.ip),
+        palermo: Number(r.ps_cum),
+        torino: Number(r.ts_max ?? 0),
+        diameterM: Number(r.diameter) * 1000,
+        kps: Number(r.v_inf),
+        // Some dates carry a fractional day ("2020-10-3.80160"); keep the calendar day.
+        lastObs: r.last_obs.replace(/-(\d+)(\.\d+)?$/, (_, d: string) => `-${d.padStart(2, "0")}`),
+      }))
+      .sort((a, b) => b.palermo - a.palermo),
+  }));
 }
 
 // ── DONKI ───────────────────────────────────────────────────────────────────
@@ -412,9 +479,102 @@ export async function getExoplanets(): Promise<Result<ExoplanetSummary>> {
   };
 }
 
-// ── GIBS ────────────────────────────────────────────────────────────────────
+// ── Scientific Visualization Studio ─────────────────────────────────────────
 
-/** Blue Marble base map rendered by the GIBS WMS service (equirectangular). */
-export const WORLD_MAP =
-  "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0" +
-  "&LAYERS=BlueMarble_ShadedRelief_Bathymetry&CRS=EPSG:4326&BBOX=-90,-180,90,180&WIDTH=1600&HEIGHT=800&FORMAT=image/jpeg";
+export type Visualization = {
+  id: number;
+  title: string;
+  type: string;
+  date: string;
+  url: string;
+  image?: string;
+};
+
+const https = (u: string) => u.replace(/^http:/, "https:");
+
+/** Newest SVS releases matching `q` (or simply the newest), each with its lead image. */
+export async function searchVisualizations(q: string): Promise<Result<Visualization[]>> {
+  type Hit = { id: number; url: string; result_type: string; release_date: string; title: string };
+  type Page = { main_image: { url: string } | null };
+  const params = new URLSearchParams({ limit: "12" });
+  if (q) params.set("search", q);
+  const hits = await get<{ results: Hit[] }>(`${SVS}/search/?${params}`, HOUR * 6, 20000);
+  if (!hits.ok) return hits;
+  const pages = await Promise.all(hits.data.results.map((h) => get<Page>(`${SVS}/${h.id}`, HOUR * 24)));
+  return {
+    ok: true,
+    data: hits.data.results.map((h, i) => {
+      const page = pages[i];
+      return {
+        id: h.id,
+        title: h.title,
+        type: h.result_type,
+        date: h.release_date,
+        url: https(h.url),
+        image: page.ok && page.data.main_image ? https(page.data.main_image.url) : undefined,
+      };
+    }),
+  };
+}
+
+// ── Technology Transfer ─────────────────────────────────────────────────────
+
+export type TechKind = "patent" | "software" | "spinoff";
+
+export type Technology = {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  category: string;
+  center: string;
+  release?: string;
+  image?: string;
+  url: string;
+};
+
+const techUrl: Record<TechKind, (code: string) => string> = {
+  patent: (code) => `https://technology.nasa.gov/patent/${code}`,
+  software: (code) => `https://software.nasa.gov/software/${code}`,
+  spinoff: () => "https://spinoff.nasa.gov/",
+};
+
+/** Strips the search-highlight markup and HTML entities TechTransfer returns. */
+function plain(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, "")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&apos;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&nbsp;/g, " ")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .trim();
+}
+
+/**
+ * Keyword search over NASA patents, software or spinoffs. Rows are positional arrays:
+ * [id, code, title, description, _, category, release, _, _, center, image, ...].
+ */
+export async function searchTechnology(
+  kind: TechKind,
+  q: string,
+): Promise<Result<{ total: number; items: Technology[] }>> {
+  type Raw = { results: string[][]; total: number };
+  const r = await get<Raw>(`${TECH}/${kind}/${encodeURIComponent(q)}`, HOUR * 24, 20000);
+  return map(r, (d) => ({
+    total: d.total,
+    items: d.results.slice(0, 12).map((row) => ({
+      id: row[0],
+      code: row[1],
+      title: plain(row[2] ?? ""),
+      description: plain(row[3] ?? ""),
+      category: row[5] ?? "",
+      center: row[9] ?? "",
+      release: kind === "software" ? row[6] || undefined : undefined,
+      image: row[10] ? encodeURI(row[10]) : undefined,
+      url: techUrl[kind](row[1]),
+    })),
+  }));
+}

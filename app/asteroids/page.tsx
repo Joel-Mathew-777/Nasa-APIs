@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import { DataTable, Empty, Meter, PageHeader, Section, Stat, Stats, Tag, Unavailable } from "@/components/ui";
-import { num } from "@/lib/format";
-import { getCloseApproaches, getNeoFeed, type Neo } from "@/lib/nasa";
+import { date, num } from "@/lib/format";
+import { getCloseApproaches, getImpactRisks, getNeoFeed, type ImpactRisk, type Neo } from "@/lib/nasa";
 
 export const revalidate = 3600;
 export const metadata: Metadata = { title: "Near-Earth asteroids" };
 
 export default async function AsteroidsPage() {
-  const [neos, passes] = await Promise.all([getNeoFeed(), getCloseApproaches()]);
+  const [neos, passes, risks] = await Promise.all([getNeoFeed(), getCloseApproaches(), getImpactRisks()]);
 
   return (
     <>
-      <PageHeader api="NeoWs · SBDB Close Approach" title="Near-Earth asteroids" endpoint="api.nasa.gov/neo/rest/v1/feed">
+      <PageHeader api="NeoWs · SBDB Close Approach · Sentry" title="Near-Earth asteroids" endpoint="api.nasa.gov/neo/rest/v1/feed">
         NeoWs lists every asteroid making a close approach on a given date, with its estimated size, speed
         and how far it will miss by. Distances are in lunar distances (LD): 1 LD is the gap between Earth and
         the Moon, about 384,400 km.
@@ -42,6 +42,16 @@ export default async function AsteroidsPage() {
               </tr>
             ))}
           </DataTable>
+        )}
+      </Section>
+
+      <Section title="Impact risk watch list" note="JPL Sentry · highest Palermo scale first">
+        {!risks.ok ? (
+          <Unavailable what="Sentry data" error={risks.error} />
+        ) : risks.data.list.length === 0 ? (
+          <Empty>No objects are on the Sentry list.</Empty>
+        ) : (
+          <ImpactRisks total={risks.data.total} list={risks.data.list} />
         )}
       </Section>
     </>
@@ -92,6 +102,37 @@ function Week({ neos }: { neos: Neo[] }) {
           ))}
         </DataTable>
       </Section>
+    </>
+  );
+}
+
+function ImpactRisks({ total, list }: { total: number; list: ImpactRisk[] }) {
+  return (
+    <>
+      <p className="mb-5 max-w-3xl text-sm leading-relaxed text-muted">
+        Sentry tracks {num(total)} asteroids whose orbits cannot yet rule out a future impact. The Palermo
+        scale compares that risk to the background chance of an impact: anything below −2 is routine, and
+        most entries drop off the list once new observations refine their orbit.
+      </p>
+      <DataTable head={["Object", "Possible impacts", "Cumulative probability", "Palermo", "Torino", "Diameter", "Last observed"]}>
+        {list.slice(0, 12).map((r) => (
+          <tr key={r.name}>
+            <td className="font-medium">
+              <a href={r.url} target="_blank" rel="noreferrer" className="hover:text-accent">
+                {r.name}
+              </a>
+            </td>
+            <td className="whitespace-nowrap text-muted">
+              {r.years} <span className="text-faint">({num(r.impacts)})</span>
+            </td>
+            <td className="whitespace-nowrap">1 in {num(1 / r.probability)}</td>
+            <td>{num(r.palermo, 2)}</td>
+            <td>{r.torino > 0 ? <Tag tone="accent">{r.torino}</Tag> : <span className="text-muted">0</span>}</td>
+            <td className="whitespace-nowrap text-muted">{r.diameterM >= 1000 ? `${num(r.diameterM / 1000, 1)} km` : `${num(r.diameterM)} m`}</td>
+            <td className="whitespace-nowrap text-muted">{date(r.lastObs)}</td>
+          </tr>
+        ))}
+      </DataTable>
     </>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { SearchForm } from "@/components/search-form";
 import { Empty, PageHeader, Unavailable } from "@/components/ui";
 import { date } from "@/lib/format";
 import { searchImages } from "@/lib/nasa";
@@ -20,43 +20,13 @@ export default async function LibraryPage({ searchParams }: { searchParams: Prom
         centre, searchable by keyword. No API key is needed.
       </PageHeader>
 
-      <form action="/library" role="search" className="flex gap-2">
-        <label htmlFor="q" className="sr-only">
-          Search NASA images
-        </label>
-        <input
-          id="q"
-          name="q"
-          type="search"
-          defaultValue={q}
-          placeholder="Search for a mission, planet or person"
-          className="min-w-0 flex-1 rounded-full border border-line bg-panel px-4 py-3 text-base placeholder:text-faint focus:border-muted focus:outline-none sm:px-5"
-        />
-        <button
-          type="submit"
-          className="shrink-0 rounded-full bg-white px-5 py-3 text-sm font-medium text-ink transition-opacity hover:opacity-85 sm:px-6"
-        >
-          Search
-        </button>
-      </form>
-      <ul className="mt-4 flex flex-wrap gap-2">
-        {suggestions.map((s) => {
-          const active = s.toLowerCase() === q.toLowerCase();
-          return (
-            <li key={s}>
-              <Link
-                href={`/library?q=${encodeURIComponent(s)}`}
-                aria-current={active ? "true" : undefined}
-                className={`inline-block rounded-full border px-3 py-1.5 text-sm transition-colors sm:py-1 ${
-                  active ? "border-muted text-white" : "border-line text-muted hover:text-white"
-                }`}
-              >
-                {s}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      <SearchForm
+        action="/library"
+        q={q}
+        label="Search NASA images"
+        placeholder="Search for a mission, planet or person"
+        suggestions={suggestions}
+      />
 
       <div className="mt-10">
         {!results.ok ? (

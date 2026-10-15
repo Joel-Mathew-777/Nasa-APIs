@@ -29,7 +29,7 @@ export function Nav() {
           <span className="size-2 rounded-full bg-accent" aria-hidden />
           Open NASA
         </Link>
-        <nav aria-label="Main" className="hidden gap-1 lg:flex">
+        <nav aria-label="Main" className="no-scrollbar hidden min-w-0 gap-0.5 overflow-x-auto xl:flex">
           {catalog.map((item) => {
             const active = pathname.startsWith(item.href);
             return (
@@ -37,7 +37,7 @@ export function Nav() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`shrink-0 rounded-md px-2.5 py-1.5 text-sm transition-colors ${
+                className={`shrink-0 rounded-md px-2 py-1.5 text-sm transition-colors ${
                   active ? "bg-raised text-white" : "text-muted hover:text-white"
                 }`}
               >
@@ -52,7 +52,7 @@ export function Nav() {
           aria-expanded={open}
           aria-controls="mobile-nav"
           aria-label={open ? "Close menu" : "Open menu"}
-          className="-mr-2.5 flex size-11 items-center justify-center rounded-md text-muted transition-colors hover:text-white lg:hidden"
+          className="-mr-2.5 flex size-11 items-center justify-center rounded-md text-muted transition-colors hover:text-white xl:hidden"
         >
           <svg
             viewBox="0 0 20 20"
@@ -71,7 +71,7 @@ export function Nav() {
         <nav
           id="mobile-nav"
           aria-label="Main"
-          className="max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-t border-line lg:hidden"
+          className="max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-t border-line xl:hidden"
         >
           <ul className="mx-auto grid max-w-6xl grid-cols-2 gap-1 px-3 py-3 sm:grid-cols-4 sm:px-6">
             {catalog.map((item) => {
